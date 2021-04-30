@@ -28,7 +28,7 @@ void* worker(void* arg){
         progress = cnt++;
     }
 
-    pthread_exit((void*)progress); // work 함수 스레드 종료 시, 반환값은 progress
+    pthread_exit((void*)progress); // return value
 }
 
 int main(int argc, char* argv[]){
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]){
         // HINT: The thread that runs `worker` should be created.
         // HINT: The address of variable `i` should be passed when thread created.
         // HINT: Each thread descriptor should be stored appropriately.
-        status = pthread_create(tids[i], NULL, worker, (void*) i);
+        status = pthread_create(&tids[i], NULL, worker, (void *)i);
 
         if(status != 0){
             printf("WTF?");
@@ -49,8 +49,8 @@ int main(int argc, char* argv[]){
     }
 
     // HINT: The main thread should not be exited until all `worker`s have finished.
-    for(int i = 0; i<NUM_THREADS; i++){
-        pthread_join(tids[i], &progress);
+    for(int i = 0; i < NUM_THREADS; i++){
+        pthread_join(tids[i],&progress);
         // HINT: The variable `progress` should not be 0.
         printf("\r%d ", progress);
 
@@ -68,7 +68,6 @@ int main(int argc, char* argv[]){
 
 int stick_this_thread_to_core(int core_id) {
    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-
    cpu_set_t cpuset;
    CPU_ZERO(&cpuset);
    CPU_SET(core_id % num_cores, &cpuset);
