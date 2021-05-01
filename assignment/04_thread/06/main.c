@@ -44,6 +44,12 @@ int main(int argc, char* argv[])
     // HINT: The `main` thread cannot wait for `worker` threads detached by `boss`.
     // HINT: Is there any information about remaining tasks that can be
     //       referenced in the `main` thread?
+    status = pthread_create(&tid, NULL, worker, NULL);
+    if(status != 0){
+        printf("WTF?");
+        return -1;
+    }
+    pthread_join(tid, NULL);
     return 0;
 }
 
@@ -51,7 +57,8 @@ int main(int argc, char* argv[])
 
 void do_job(char* actor){
     cnt_task--;
-    printf("[%s] working...\n", actor);
+    printf("[%s] working...\n", actor); // 코드 흐름이 왔다갔다 하게 될 것. 어떤 스레드가 먼저 실행되는지 순서는 알 수 없다.
+
 }
 
 void go_home(char* actor){
@@ -62,7 +69,6 @@ void* worker(void* arg)
 {
     char act[20];
     sprintf(act, "%s%d", "worker", (int)arg);
-
     for(int i = 0; i < 3; i++)
     {
         sleep(1);
@@ -78,7 +84,7 @@ void* boss(void* arg)
     int status;
     for(int i = 0; i < NUM_WORKERS; i++)
     {
-        status = pthread_create(&tid, NULL, worker, (void*)i);
+        status = pthread_create(&tid, NULL, worker, (void*)i); // worker의 매개변수 값은 i가 들어옴
 
         if (status != 0)
         {
