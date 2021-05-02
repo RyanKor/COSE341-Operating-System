@@ -67,7 +67,7 @@ int main(int argc, char* argv[]){
         fflush(stdout);
         usleep(10*1000); // 10ms
     }
-
+    status = pthread_mutex_destroy(&counter);
     printf("\nexpectd: %d\n", NUM_THREADS * NUM_TASKS);
     printf("result: %d\n", cnt);
 

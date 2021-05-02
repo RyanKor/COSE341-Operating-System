@@ -53,12 +53,20 @@ int main(int argc, char* argv[])
 
     pthread_join(tid, NULL);
 
+    status = pthread_create(&tid, NULL, worker, NULL);
+
+    if (status != 0)
+    {
+        printf("WTF?");
+        return -1;
+    }
+
+    pthread_join(tid, NULL);
+
     printf("Remaining task(s): %d\n", cnt_task);
 
     return 0;
 }
-
-
 
 void do_job(char* actor){
     printf("[%s] working...\n", actor);
@@ -72,14 +80,16 @@ void* worker(void* arg)
 {
     char act[20];
     sprintf(act, "%s%d", "worker", (int)arg);
-
     for(int i = 0; i < 3; i++)
-    {
+    { 
+        pthread_mutex_lock(&task_done);
         sleep(1);
+        cnt_task--; // 가운데 삽입될 때만 나머지 태스크가 1이 남는다.
         do_job(act);
+        pthread_mutex_unlock(&task_done);
     }
-    
     sleep(0);
+
     pthread_exit(NULL);
 }
 
@@ -89,20 +99,20 @@ void* boss(void* arg)
     int status;
 
     pthread_mutex_lock(&task_done);
-
+    
     for(int i = 0; i < NUM_WORKERS; i++) 
     {
         status = pthread_create(&tid, NULL, worker, (void*)i);
-
+        cnt_task--;
         if (status != 0)
         {
             printf("WTF?");
             return (void*)-1;
         }
-
         pthread_detach(tid);
     }
-
+    pthread_mutex_unlock(&task_done);
+    
     go_home("like a boss");
     pthread_exit(NULL);
 }
