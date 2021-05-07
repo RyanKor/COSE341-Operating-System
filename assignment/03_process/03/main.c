@@ -20,3 +20,11 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
+
+/*
+Expected output:
+Before executing `ls -l`.
+total 20
+-rwxr-xr-x 1 root root 15484 Apr 25 01:37 main
+-rw-r--r-- 1 root root   453 Apr 25 01:37 main.c
+*/

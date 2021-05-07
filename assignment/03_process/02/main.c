@@ -36,3 +36,9 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
+/*
+Expected output:
+The value is 1
+The value is 2 in parent.
+The value is 0 in child. // It will be printed on the command line.
+*/

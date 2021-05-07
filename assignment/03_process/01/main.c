@@ -48,3 +48,12 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
+/*
+Expected output:
+My pid is 7421 (child)
+The answer to the ultimate question of life the universe and everything is 0.
+But Arthur replied that it was 0.
+My pid is 7420 (parent)
+The answer to the ultimate question of life the universe and everything is 42.
+But Arthur replied that it was 54.
+*/

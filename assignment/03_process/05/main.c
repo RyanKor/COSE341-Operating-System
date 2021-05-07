@@ -46,3 +46,9 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
+/*
+Expected output:
+It breaks my heart to see my fellow zealots suffer on the battlefield.
+But what if we dragoons went to their rescue?
+Duh! Ra! Goon!
+*/
