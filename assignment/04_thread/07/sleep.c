@@ -18,8 +18,6 @@
 
 static _Atomic int cnt_task = NUM_TOTAL_TASK;
 pthread_mutex_t task_done;
-pthread_cond_t  c1 = PTHREAD_COND_INITIALIZER ;
-pthread_cond_t  c2 = PTHREAD_COND_INITIALIZER ;
 void do_job(char* actor);
 void go_home(char* actor);
 void* worker(void* arg);
@@ -43,7 +41,6 @@ int main(int argc, char* argv[])
     int status;
 
     pthread_mutex_init(&task_done, NULL);
-    pthread_cond_init(&c1, NULL);
     status = pthread_create(&tid, NULL, boss, NULL);
 
     if (status != 0)
@@ -51,13 +48,15 @@ int main(int argc, char* argv[])
         printf("WTF?");
         return -1;
     }
+
     pthread_join(tid, NULL);
-    
-    status = pthread_mutex_destroy(&task_done);
+    sleep(cnt_task);
+    pthread_mutex_destroy(&task_done);
     printf("Remaining task(s): %d\n", cnt_task);
 
     return 0;
 }
+
 
 
 void do_job(char* actor){
@@ -72,21 +71,17 @@ void* worker(void* arg)
 {
     char act[20];
     sprintf(act, "%s%d", "worker", (int)arg);
-   
+
     for(int i = 0; i < 3; i++)
     {
         sleep(1);
         pthread_mutex_lock(&task_done);
         cnt_task--;
-        pthread_cond_signal(&c2);
         pthread_mutex_unlock(&task_done);
         do_job(act);
-        
     }
     
-
     sleep(0);
-  
     pthread_exit(NULL);
 }
 
@@ -94,7 +89,6 @@ void* boss(void* arg)
 {
     pthread_t tid;
     int status;
-    
 
     pthread_mutex_lock(&task_done);
     
@@ -102,7 +96,7 @@ void* boss(void* arg)
     {
         
         status = pthread_create(&tid, NULL, worker, (void*)i);
-        pthread_cond_wait(&c2, &task_done) ;
+    
         if (status != 0)
         {
             printf("WTF?");
@@ -110,17 +104,17 @@ void* boss(void* arg)
         }
         
         pthread_detach(tid);
-
+       
     }
+    
     pthread_mutex_unlock(&task_done);
+
     go_home("like a boss");
-    // pthread_cond_signal(&c2);
     pthread_exit(NULL);
 }
 
 
 
-    
 
 /*
 Expected output:
