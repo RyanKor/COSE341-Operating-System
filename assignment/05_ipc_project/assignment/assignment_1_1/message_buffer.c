@@ -6,13 +6,15 @@
 #include <sys/shm.h>
 
 int shmid;
-void *memory_segment=NULL;
+void *memory_segment = NULL;
 
-int init_buffer(MessageBuffer **buffer) {
+int init_buffer(MessageBuffer **buffer)
+{
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
-
-    {}
+    int size = sizeof(buffer);
+    if (shmid = shmget(KEY, size, IPC_CREAT | 0666) == -1)
+        return -1;
 
     /* TODO 1 : END                          */
     /*---------------------------------------*/
@@ -21,12 +23,14 @@ int init_buffer(MessageBuffer **buffer) {
     return 0;
 }
 
-int attach_buffer(MessageBuffer **buffer) {
+int attach_buffer(MessageBuffer **buffer)
+{
     /*---------------------------------------*/
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
-    
-    {}
+    // shmat(shmid, memory_segment, shmflg)
+    {
+    }
 
     /* TODO 2 : END                          */
     /*---------------------------------------*/
@@ -36,8 +40,10 @@ int attach_buffer(MessageBuffer **buffer) {
     return 0;
 }
 
-int detach_buffer() {
-    if (shmdt(memory_segment) == -1) {
+int detach_buffer()
+{
+    if (shmdt(memory_segment) == -1)
+    {
         printf("shmdt error!\n\n");
         return -1;
     }
@@ -46,8 +52,10 @@ int detach_buffer() {
     return 0;
 }
 
-int destroy_buffer() {
-    if(shmctl(shmid, IPC_RMID, NULL) == -1) {
+int destroy_buffer()
+{
+    if (shmctl(shmid, IPC_RMID, NULL) == -1)
+    {
         printf("shmctl error!\n\n");
         return -1;
     }
@@ -56,22 +64,23 @@ int destroy_buffer() {
     return 0;
 }
 
-int produce(MessageBuffer **buffer, int sender_id, char *data) {
-    if (is_full(**buffer)) {
+int produce(MessageBuffer **buffer, int sender_id, char *data)
+{
+    if (is_full(**buffer))
+    {
         printf("full!\n\n");
         return -1;
     }
 
-    if (strlen(data) > 100) {
+    if (strlen(data) > 100)
+    {
         printf("len(data) > 100\n\n");
         return -1;
     }
 
     /*---------------------------------------*/
     /* TODO 3 : produce message              */
-    
-    {}
-
+    Message next_produced;
     /* TODO 3 : END                          */
     /*---------------------------------------*/
 
@@ -79,36 +88,43 @@ int produce(MessageBuffer **buffer, int sender_id, char *data) {
     return 0;
 }
 
-int consume(MessageBuffer **buffer, Message **message) {
-    if (is_empty(**buffer)) {
+int consume(MessageBuffer **buffer, Message **message)
+{
+    if (is_empty(**buffer))
+    {
         return -1;
     }
 
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
-    
-    {}
+    Message next_consumed;
+    {
+    }
 
     /* TODO 4 : END                          */
     /*---------------------------------------*/
     return 0;
 }
 
-int is_empty(MessageBuffer buffer) {
+int is_empty(MessageBuffer buffer)
+{
     /*---------------------------------------*/
     /* TODO 5 : is empty?                    */
-    
-    {}
+
+    {
+    }
 
     /* TODO 5 : END                          */
     /*---------------------------------------*/
 }
 
-int is_full(MessageBuffer buffer) {
+int is_full(MessageBuffer buffer)
+{
     /*---------------------------------------*/
     /* TODO 6 : is full?                     */
-    
-    {}
+
+    {
+    }
 
     /* TODO 6 : END                          */
     /*---------------------------------------*/

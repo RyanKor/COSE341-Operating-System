@@ -1,6 +1,7 @@
 #include "message_buffer.h"
 
-int main(void) {
+int main(void)
+{
     MessageBuffer *buffer;
     attach_buffer(&buffer);
     destroy_buffer();

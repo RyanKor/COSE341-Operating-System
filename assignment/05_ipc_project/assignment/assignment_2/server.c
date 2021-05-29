@@ -9,7 +9,8 @@
 #define NP_SEND "./server_to_client"
 #define NP_RECEIVE "./client_to_server"
 
-int main(void) {
+int main(void)
+{
 	char receive_msg[BUFFER_SIZE], send_msg[BUFFER_SIZE];
 	int receive_fd, send_fd;
 	int value;
@@ -20,16 +21,19 @@ int main(void) {
 	/* (2) make NP_SEND pipe                 */
 	/* (3) init receive_fd and send_fd       */
 
-	{}
+	{
+	}
 
 	/* TODO 3 : END                          */
 	/*---------------------------------------*/
 
-	while (1) {
+	while (1)
+	{
 		/*---------------------------------------*/
 		/* TODO 4 : read msg                     */
-		
-		{}
+
+		{
+		}
 
 		/* TODO 4 : END                          */
 		/*---------------------------------------*/
@@ -38,13 +42,14 @@ int main(void) {
 
 		value = atoi(receive_msg);
 
-		sprintf(send_msg, "%d", value*value);
+		sprintf(send_msg, "%d", value * value);
 		printf("server : send %s\n", send_msg);
 
 		/*---------------------------------------*/
 		/* TODO 5 : write msg                    */
 
-		{}
+		{
+		}
 
 		/* TODO 5 : END                          */
 		/*---------------------------------------*/

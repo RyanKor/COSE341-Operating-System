@@ -1,12 +1,14 @@
 #define KEY 54321
 #define BUFFER_SIZE 10
 
-typedef struct {
+typedef struct // Message 구조체 생성
+{
     int sender_id;
     char data[101];
 } Message;
 
-typedef struct {
+typedef struct // MessageBuffer 구조체 생성
+{
     Message messages[BUFFER_SIZE];
     int in;
     int out;

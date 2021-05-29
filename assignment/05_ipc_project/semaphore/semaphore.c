@@ -7,59 +7,78 @@
 #define SHM_KEY 4321
 #define SEM_KEY 4321
 
-void s_wait(int semid) {
+union semun
+{
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+};
+
+void s_wait(int semid)
+{
     struct sembuf buf;
     buf.sem_num = 0;
     buf.sem_op = -1;
     buf.sem_flg = SEM_UNDO;
 
-    if (semop(semid, &buf, 1) == -1) {
+    if (semop(semid, &buf, 1) == -1)
+    {
         printf("<s_wait> semop error!\n");
-        return ;
+        return;
     }
 }
 
-void s_quit(int semid) {
+void s_quit(int semid)
+{
     struct sembuf buf;
     buf.sem_num = 0;
     buf.sem_op = 1;
     buf.sem_flg = SEM_UNDO;
 
-    if (semop(semid, &buf, 1) == -1) {
+    if (semop(semid, &buf, 1) == -1)
+    {
         printf("<s_quit> semop error!\n");
-        return ;
+        return;
     }
 }
 
-int main(){
+int main()
+{
     int shmid;
     int *num;
-    void *memory_segment=NULL;
+    void *memory_segment = NULL;
 
     int semid;
     union semun sem_union;
 
     // shared memory
-    if ((shmid = shmget(SHM_KEY, sizeof(int), IPC_CREAT|0666)) == -1) return -1;
+    if ((shmid = shmget(SHM_KEY, sizeof(int), IPC_CREAT | 0666)) == -1)
+        return -1;
 
     printf("shmid : %d\n", shmid);
 
-    if ((memory_segment = shmat(shmid, NULL, 0)) == (void*)-1) return -1;
+    if ((memory_segment = shmat(shmid, NULL, 0)) == (void *)-1)
+        return -1;
 
     // semaphore
-    if ((semid = semget(SEM_KEY, 1, IPC_CREAT|IPC_EXCL|0666)) == -1) {
+    if ((semid = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0666)) == -1)
+    {
         // try as a client
-        if ((semid = semget(SEM_KEY, 0, 0)) == -1) return -1;
+        if ((semid = semget(SEM_KEY, 0, 0)) == -1)
+            return -1;
+    }
+    else
+    {
+        sem_union.val = 1;
+        semctl(semid, 0, SETVAL, sem_union);
     }
 
     printf("semid : %d\n", semid);
 
-    sem_union.val = 1;
-    semctl(semid, 0, SETVAL, sem_union);
+    num = (int *)memory_segment;
 
-    num = (int*)memory_segment;
-
-    for (int i=0; i<1000000; i++) {
+    for (int i = 0; i < 1000000; i++)
+    {
         s_wait(semid);
         (*num)++;
         s_quit(semid);
