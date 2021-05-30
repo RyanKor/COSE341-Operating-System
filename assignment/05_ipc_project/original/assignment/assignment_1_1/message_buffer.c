@@ -6,17 +6,13 @@
 #include <sys/shm.h>
 
 int shmid;
-void *memory_segment = NULL;
+void *memory_segment=NULL;
 
-int init_buffer(MessageBuffer **buffer)
-{
+int init_buffer(MessageBuffer **buffer) {
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
-    buffer[0]->in = 0;
-    buffer[0]->out = 0;
-    // shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666);
-    // if (shmid == -1)
-    //     return -1;
+
+    {}
 
     /* TODO 1 : END                          */
     /*---------------------------------------*/
@@ -25,17 +21,13 @@ int init_buffer(MessageBuffer **buffer)
     return 0;
 }
 
-int attach_buffer(MessageBuffer **buffer)
-{
+int attach_buffer(MessageBuffer **buffer) {
     /*---------------------------------------*/
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
-    shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
-    if (shmid == -1)
-        return -1;
-    memory_segment = shmat(shmid, NULL, 0);
-    if (memory_segment == (void *)-1)
-        return -1;
+    
+    {}
+
     /* TODO 2 : END                          */
     /*---------------------------------------*/
 
@@ -44,10 +36,8 @@ int attach_buffer(MessageBuffer **buffer)
     return 0;
 }
 
-int detach_buffer()
-{
-    if (shmdt(memory_segment) == -1)
-    {
+int detach_buffer() {
+    if (shmdt(memory_segment) == -1) {
         printf("shmdt error!\n\n");
         return -1;
     }
@@ -56,10 +46,8 @@ int detach_buffer()
     return 0;
 }
 
-int destroy_buffer()
-{
-    if (shmctl(shmid, IPC_RMID, NULL) == -1)
-    {
+int destroy_buffer() {
+    if(shmctl(shmid, IPC_RMID, NULL) == -1) {
         printf("shmctl error!\n\n");
         return -1;
     }
@@ -68,32 +56,22 @@ int destroy_buffer()
     return 0;
 }
 
-int produce(MessageBuffer **buffer, int sender_id, char *data)
-{
-    if (is_full(**buffer))
-    {
+int produce(MessageBuffer **buffer, int sender_id, char *data) {
+    if (is_full(**buffer)) {
         printf("full!\n\n");
         return -1;
     }
 
-    if (strlen(data) > 100)
-    {
+    if (strlen(data) > 100) {
         printf("len(data) > 100\n\n");
         return -1;
     }
 
     /*---------------------------------------*/
     /* TODO 3 : produce message              */
-    Message next_produced;
-    while (1)
-    {
-        int in = buffer[0]->in;
-        int out = buffer[0]->out;
-        next_produced.data[in] = data;
-        next_produced.sender_id = sender_id;
-        buffer[0]->messages[in] = next_produced;
-        in = (in + 1) % BUFFER_SIZE;
-    }
+    
+    {}
+
     /* TODO 3 : END                          */
     /*---------------------------------------*/
 
@@ -101,48 +79,37 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
     return 0;
 }
 
-int consume(MessageBuffer **buffer, Message **message)
-{
-    if (is_empty(**buffer))
-    {
+int consume(MessageBuffer **buffer, Message **message) {
+    if (is_empty(**buffer)) {
         return -1;
     }
 
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
-    Message next_consumed;
-    int in = buffer[0]->in;
-    int out = buffer[0]->out;
-    while (1)
-    {
-        next_consumed = buffer[0]->messages[out];
-        out = (out + 1) % BUFFER_SIZE;
-    }
+    
+    {}
+
     /* TODO 4 : END                          */
     /*---------------------------------------*/
     return 0;
 }
 
-int is_empty(MessageBuffer buffer)
-{
+int is_empty(MessageBuffer buffer) {
     /*---------------------------------------*/
     /* TODO 5 : is empty?                    */
-    if (buffer.in == buffer.out)
-        return -1;
+    
+    {}
 
-    return 0;
     /* TODO 5 : END                          */
     /*---------------------------------------*/
 }
 
-int is_full(MessageBuffer buffer)
-{
+int is_full(MessageBuffer buffer) {
     /*---------------------------------------*/
     /* TODO 6 : is full?                     */
-    if ((buffer.in + 1) % BUFFER_SIZE == buffer.out)
-        return -1;
+    
+    {}
 
-    return 0;
     /* TODO 6 : END                          */
     /*---------------------------------------*/
 }

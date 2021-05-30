@@ -17,7 +17,6 @@ int main()
 
     if ((memory_segment = shmat(shmid, NULL, 0)) == (void *)-1) //memory attach
         return -1;
-
     num = (int *)memory_segment;
     (*num)++;
     printf("num : %d\n", (*num));
