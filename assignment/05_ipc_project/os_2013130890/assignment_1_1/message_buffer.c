@@ -12,12 +12,14 @@ int init_buffer(MessageBuffer **buffer)
 {
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
-    buffer[0]->in = 0;
-    buffer[0]->out = 0;
-    // shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666);
-    // if (shmid == -1)
-    //     return -1;
 
+    shmid = shmget(KEY, sizeof(*buffer), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
+    if (shmid == -1)
+        return -1;
+    memory_segment = shmat(shmid, NULL, 0);
+    *buffer = (MessageBuffer *)memory_segment;
+    (*buffer)->in = 0;
+    (*buffer)->out = 0;
     /* TODO 1 : END                          */
     /*---------------------------------------*/
 
@@ -30,10 +32,7 @@ int attach_buffer(MessageBuffer **buffer)
     /*---------------------------------------*/
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
-    shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
-    if (shmid == -1)
-        return -1;
-    memory_segment = shmat(shmid, NULL, 0);
+    shmid = shmget(KEY, sizeof(*buffer), IPC_CREAT | 0666); // 해당 코드가 없을 경우, destroy error 발생
     if (memory_segment == (void *)-1)
         return -1;
     /* TODO 2 : END                          */
@@ -87,12 +86,11 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
     Message next_produced;
     while (1)
     {
-        int in = buffer[0]->in;
-        int out = buffer[0]->out;
-        next_produced.data[in] = data;
-        next_produced.sender_id = sender_id;
-        buffer[0]->messages[in] = next_produced;
-        in = (in + 1) % BUFFER_SIZE;
+        strcpy((*buffer)->messages[(*buffer)->in].data, data);
+        (*buffer)->messages[(*buffer)->in].sender_id = sender_id;
+        // (*buffer)->messages[(*buffer)->in] = next_produced;
+        (*buffer)->in = ((*buffer)->in + 1) % BUFFER_SIZE;
+        break;
     }
     /* TODO 3 : END                          */
     /*---------------------------------------*/
@@ -110,13 +108,13 @@ int consume(MessageBuffer **buffer, Message **message)
 
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
-    Message next_consumed;
-    int in = buffer[0]->in;
-    int out = buffer[0]->out;
     while (1)
     {
-        next_consumed = buffer[0]->messages[out];
-        out = (out + 1) % BUFFER_SIZE;
+        *message = (Message *)memory_segment;
+        strcpy((*message)->data, (*buffer)->messages[(*buffer)->out].data);
+        (*message)->sender_id = (*buffer)->messages[(*buffer)->out].sender_id;
+        (*buffer)->out = ((*buffer)->out + 1) % BUFFER_SIZE;
+        break;
     }
     /* TODO 4 : END                          */
     /*---------------------------------------*/
