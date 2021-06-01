@@ -22,7 +22,6 @@ int init_buffer(MessageBuffer **buffer)
     (*buffer)->out = 0;
     /* TODO 1 : END                          */
     /*---------------------------------------*/
-
     printf("init buffer\n");
     return 0;
 }
@@ -32,10 +31,11 @@ int attach_buffer(MessageBuffer **buffer)
     /*---------------------------------------*/
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
-    shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
+    shmid = shmget(KEY, sizeof(int), 0); // 이미 존재하고 있는 메모리 가져오기
     if (shmid == -1)
         return -1;
     memory_segment = shmat(shmid, NULL, 0);
+    *buffer = (MessageBuffer *)memory_segment;
     if (memory_segment == (void *)-1) //memory attach
         return -1;
     /* TODO 2 : END                          */
@@ -86,10 +86,8 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
 
     /*---------------------------------------*/
     /* TODO 3 : produce message              */
-    Message next_produced;
-    strcpy(next_produced.data, data);
-    next_produced.sender_id = sender_id;
-    (*buffer)->messages[(*buffer)->in] = next_produced;
+    strcpy((*buffer)->messages[(*buffer)->in].data, (char *)data);
+    (*buffer)->messages[(*buffer)->in].sender_id = sender_id;
     (*buffer)->in = ((*buffer)->in + 1) % BUFFER_SIZE;
     /* TODO 3 : END                          */
     /*---------------------------------------*/
@@ -100,17 +98,18 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
 
 int consume(MessageBuffer **buffer, Message **message)
 {
+
     if (is_empty(**buffer))
     {
         return -1;
     }
-
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
+    memory_segment = shmat(shmid, NULL, 0);
+    *message = (Message *)memory_segment;
+    strcpy((*message)->data, (*buffer)->messages[(*buffer)->out].data);
+    (*message)->sender_id = (*buffer)->messages[(*buffer)->out].sender_id;
 
-    // while (((*buffer)->in == (*buffer)->out)) // is_empty 함수가 역할 대체
-    //     ;
-    **message = (*buffer)->messages[(*buffer)->out];
     (*buffer)->out = ((*buffer)->out + 1) % BUFFER_SIZE;
 
     /* TODO 4 : END                          */

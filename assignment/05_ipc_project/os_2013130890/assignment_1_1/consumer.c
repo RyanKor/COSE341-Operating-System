@@ -1,6 +1,5 @@
 #include "message_buffer.h"
 #include <stdio.h>
-
 int main(void)
 {
     MessageBuffer *buffer;
