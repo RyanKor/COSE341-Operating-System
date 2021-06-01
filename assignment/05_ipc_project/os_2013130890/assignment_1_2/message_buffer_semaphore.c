@@ -23,7 +23,10 @@ void init_sem()
     {
         // try as a client
         if ((semid = semget(SEM_KEY, 0, 0)) == -1)
-            return -1;
+        {
+            printf("semget error!");
+            return;
+        }
     }
     else
     {
@@ -42,7 +45,10 @@ void destroy_sem()
     /* TODO 2 : destroy semaphore            */
 
     if (semctl(semid, 0, IPC_RMID) == -1)
-        return -1;
+    {
+        printf("semctl error!");
+        return;
+    }
     printf("destroy semid : %d\n", semid);
 
     /* TODO 2 : END                          */
@@ -88,7 +94,7 @@ int init_buffer(MessageBuffer **buffer)
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
 
-    shmid = shmget(SHM_KEY, sizeof(*buffer), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
+    shmid = shmget(SHM_KEY, sizeof(int), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
     if (shmid == -1)
         return -1;
     memory_segment = shmat(shmid, NULL, 0);
@@ -107,7 +113,7 @@ int attach_buffer(MessageBuffer **buffer)
     /*---------------------------------------*/
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
-    shmid = shmget(SHM_KEY, sizeof(*buffer), IPC_CREAT | 0666); // 해당 코드가 없을 경우, destroy error 발생
+    shmid = shmget(SHM_KEY, sizeof(int), IPC_CREAT | 0666);
     if (memory_segment == (void *)-1)
         return -1;
     /* TODO 2 : END                          */
@@ -159,16 +165,12 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
     /*---------------------------------------*/
     /* TODO 3 : produce message              */
     Message next_produced;
-    while (1)
-    {
-        s_wait();
-        strcpy((*buffer)->messages[(*buffer)->in].data, data);
-        (*buffer)->messages[(*buffer)->in].sender_id = sender_id;
-        s_quit();
-        // (*buffer)->messages[(*buffer)->in] = next_produced;
-        (*buffer)->in = ((*buffer)->in + 1) % BUFFER_SIZE;
-        break;
-    }
+    s_wait();
+    strcpy(next_produced.data, data);
+    next_produced.sender_id = sender_id;
+    (*buffer)->messages[(*buffer)->in] = next_produced;
+    (*buffer)->in = ((*buffer)->in + 1) % BUFFER_SIZE;
+    s_quit();
     /* TODO 3 : END                          */
     /*---------------------------------------*/
 
@@ -185,16 +187,14 @@ int consume(MessageBuffer **buffer, Message **message)
 
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
-    while (1)
-    {
-        *message = (Message *)memory_segment;
-        s_wait();
-        strcpy((*message)->data, (*buffer)->messages[(*buffer)->out].data);
-        (*message)->sender_id = (*buffer)->messages[(*buffer)->out].sender_id;
-        s_quit();
-        (*buffer)->out = ((*buffer)->out + 1) % BUFFER_SIZE;
-        break;
-    }
+
+    // while (((*buffer)->in == (*buffer)->out)) // is_empty 함수가 역할 대체
+    //     ;
+    s_wait();
+    **message = (*buffer)->messages[(*buffer)->out];
+    (*buffer)->out = ((*buffer)->out + 1) % BUFFER_SIZE;
+    s_quit();
+
     /* TODO 4 : END                          */
     /*---------------------------------------*/
     return 0;

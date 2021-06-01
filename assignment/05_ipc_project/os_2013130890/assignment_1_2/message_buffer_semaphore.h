@@ -2,7 +2,7 @@
 #define SHM_KEY 54321
 #define BUFFER_SIZE 10
 
-union semun
+union //senum 공용체 변수 이름 삭제 (환경에 따라 이름 삭제해야는 상황 발생)
 {
     int val;
     struct semid_ds *buf;
