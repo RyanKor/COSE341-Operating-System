@@ -12,11 +12,12 @@ int init_buffer(MessageBuffer **buffer)
 {
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
-
     shmid = shmget(KEY, sizeof(int), IPC_CREAT | 0666); // 해당 선언문이 없을 경우, 에러 발생. shmid가 갱신이 안됨
     if (shmid == -1)
         return -1;
     memory_segment = shmat(shmid, NULL, 0);
+    if (memory_segment == (void *)-1) //memory attach
+        return -1;
     *buffer = (MessageBuffer *)memory_segment;
     (*buffer)->in = 0;
     (*buffer)->out = 0;
