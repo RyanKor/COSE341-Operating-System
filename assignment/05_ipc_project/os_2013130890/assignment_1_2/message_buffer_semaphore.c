@@ -95,6 +95,8 @@ int init_buffer(MessageBuffer **buffer)
     if (shmid == -1)
         return -1;
     memory_segment = shmat(shmid, NULL, 0);
+    if (memory_segment == (void *)-1) //memory attach
+        return -1;
     *buffer = (MessageBuffer *)memory_segment;
     (*buffer)->in = 0;
     (*buffer)->out = 0;
@@ -145,6 +147,7 @@ int destroy_buffer()
 
 int produce(MessageBuffer **buffer, int sender_id, char *data)
 {
+    s_wait();
     if (is_full(**buffer))
     {
         printf("full!\n\n");
@@ -157,7 +160,6 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
         return -1;
     }
 
-    s_wait();
     strcpy((*buffer)->messages[(*buffer)->in].data, (char *)data);
     (*buffer)->messages[(*buffer)->in].sender_id = sender_id;
     (*buffer)->in = ((*buffer)->in + 1) % BUFFER_SIZE;
@@ -169,7 +171,7 @@ int produce(MessageBuffer **buffer, int sender_id, char *data)
 
 int consume(MessageBuffer **buffer, Message **message)
 {
-
+    s_wait();
     if (is_empty(**buffer))
     {
         return -1;
@@ -177,7 +179,7 @@ int consume(MessageBuffer **buffer, Message **message)
 
     memory_segment = shmat(shmid, NULL, 0);
     *message = (Message *)memory_segment;
-    s_wait();
+
     strcpy((*message)->data, (*buffer)->messages[(*buffer)->out].data);
     (*message)->sender_id = (*buffer)->messages[(*buffer)->out].sender_id;
     (*buffer)->out = ((*buffer)->out + 1) % BUFFER_SIZE;
