@@ -1,5 +1,9 @@
-# COSE 341 운영체제 수업 강의 자료 정리
+# COSE 341 운영체제 
 
-1. 수업 과제 내역 정리
-2. 중간고사 공부 내용 정리
-3. 강의 자료 정리
+- Ubuntu 16.08 LTS Virtual Box 시스템 환경 구성 & 시스템 콜 생성
+
+- Multiprocess 실습 환경 구성 및 프로세스 통신
+
+- 스레드 생성 및 통신
+
+- IPC(Inter Process Communication), Semaphore 실습
